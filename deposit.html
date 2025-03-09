@@ -93,6 +93,12 @@
       let currentBalance = Number(localStorage.getItem("balance")) || 0;
       let newBalance = currentBalance + depositAmount;
       localStorage.setItem("balance", newBalance);
+      
+      // Record transaction.
+      let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      transactions.push({ type: "deposit", amount: depositAmount, date: new Date().toLocaleString() });
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+      
       alert("Deposited UGX " + depositAmount);
       window.location.href = "index.html";
     });

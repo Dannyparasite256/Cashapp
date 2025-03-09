@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Withdraw Money</title>
+
+  <!-- Google Fonts: Using the provided fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #4834d4;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .withdraw-container {
+      background-color: #fff;
+      color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .withdraw-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .withdraw-form {
+      display: flex;
+      flex-direction: column;
+    }
+    .withdraw-form label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .withdraw-form input {
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    .withdraw-form button {
+      padding: 10px;
+      background-color: #4834d4;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .back-button {
+      display: block;
+      margin: 20px auto;
+      background-color: #2b1f74;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="withdraw-container">
+    <h2>Withdraw Money</h2>
+    <form class="withdraw-form" id="withdrawForm">
+      <label for="withdrawAmount">Enter Amount:</label>
+      <input type="number" id="withdrawAmount" name="withdrawAmount" required placeholder="Enter amount">
+      <button type="submit">Withdraw</button>
+    </form>
+    <a href="index.html" class="back-button">Back</a>
+  </div>
+
+  <script>
+    document.getElementById("withdrawForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      const withdrawAmount = Number(document.getElementById("withdrawAmount").value);
+      let currentBalance = Number(localStorage.getItem("balance")) || 0;
+      if (withdrawAmount > currentBalance) {
+        alert("Insufficient funds!");
+        return;
+      }
+      let newBalance = currentBalance - withdrawAmount;
+      localStorage.setItem("balance", newBalance);
+      alert("Withdrew UGX " + withdrawAmount);
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wallet UI</title>
+
+  <!-- Google Fonts: Using the provided fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* Using Montserrat as primary font */
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #4834d4;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #4834d4;
+    }
+    .header-left {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    /* Each currency is just the code now */
+    .header-left p {
+      font-size: 0.9rem;
+      color: #fff;
+      padding: 5px 10px;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .header-left p.active-currency {
+      background-color: #2b1f74;
+      border-color: #9587e0;
+    }
+    .header .material-icons {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* MAIN BALANCE SECTION */
+    .balance-section {
+      text-align: center;
+      padding: 50px 20px;
+      user-select: none;
+    }
+    .balance-amount {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .main-balance {
+      font-size: 1.2rem;
+      color: #c9c3ee;
+    }
+
+    /* ACTION BUTTONS */
+    .action-buttons {
+      display: flex;
+      justify-content: space-evenly;
+      padding: 30px 20px;
+    }
+    .action-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .action-button .material-icons {
+      font-size: 2em;
+      padding: 10px;
+      border-radius: 50%;
+      background-color: #2b1f74;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .action-button span {
+      color: #9587e0;
+      font-size: 0.9rem;
+    }
+
+    /* TRANSACTIONS SECTION */
+    .transactions {
+      background-color: #fff;
+      color: #333;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .transactions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .transactions-header h2 { font-size: 1.3rem; }
+    .transactions-header a {
+      text-decoration: none;
+      color: #4834d4;
+      font-size: 0.95rem;
+    }
+    .transactions-date {
+      font-weight: 500;
+      margin: 15px 0 5px;
+      color: #777;
+      font-size: 0.9rem;
+    }
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .transaction-item:last-child { border-bottom: none; }
+    .transaction-item-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .transaction-item-left img {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+    }
+    .transaction-item-left .material-icons {
+      font-size: 25px;
+      color: #4834d4;
+    }
+    .transaction-details {
+      display: flex;
+      flex-direction: column;
+    }
+    .transaction-type {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .transaction-date { font-size: 0.85rem; color: #999; }
+    .transaction-amount { font-weight: 600; font-size: 1rem; }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 600px;
+      background-color: #fff;
+      color: #333;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 1px solid #eee;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      color: #777;
+      font-size: 0.8rem;
+    }
+    .nav-item .material-icons {
+      font-size: 1.3rem;
+      margin-bottom: 5px;
+    }
+    .nav-item.active { color: #4834d4; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- HEADER: Only currency codes (active one highlighted) -->
+    <div class="header">
+      <div class="header-left" id="currencyList">
+        <p data-currency="UGX" class="active-currency">UGX</p>
+        <p data-currency="EUR">EUR</p>
+        <p data-currency="GBP">GBP</p>
+        <p data-currency="GHS">GHS</p>
+        <p data-currency="KES">KES</p>
+        <p data-currency="NGN">NGN</p>
+        <p data-currency="USD">USD</p>
+        <p data-currency="CAD">CAD</p>
+        <p data-currency="JPY">JPY</p>
+      </div>
+      <span class="material-icons">notifications</span>
+    </div>
+
+    <!-- MAIN BALANCE SECTION -->
+    <div class="balance-section" id="balanceSection">
+      <div class="balance-amount" id="mainBalance">UGX 0</div>
+      <div class="main-balance">Main balance</div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="action-buttons">
+      <div class="action-button" id="addMoneyButton">
+        <span class="material-icons">add_circle</span>
+        <span>Add money</span>
+      </div>
+      <div class="action-button">
+        <span class="material-icons">swap_horiz</span>
+        <span>Exchange</span>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS SECTION -->
+    <div class="transactions">
+      <div class="transactions-header">
+        <h2>Transactions</h2>
+        <a href="#">See</a>
+      </div>
+      <div class="transactions-date">February 16</div>
+      <div class="transaction-item">
+        <div class="transaction-item-left">
+          <img src="https://flagcdn.com/w320/us.png" alt="US Flag" />
+          <div class="transaction-details">
+            <div class="transaction-type">Exchanged to USD</div>
+            <div class="transaction-date">20:55</div>
+          </div>
+        </div>
+        <div class="transaction-amount">- UGX 0</div>
+      </div>
+      <div class="transactions-date">February 13</div>
+      <div class="transaction-item">
+        <div class="transaction-item-left">
+          <span class="material-icons">person</span>
+          <div class="transaction-details">
+            <div class="transaction-type">Sent to Dan Airtel</div>
+            <div class="transaction-date">17:52</div>
+          </div>
+        </div>
+        <div class="transaction-amount">- UGX 13,871</div>
+      </div>
+      <div class="transaction-item">
+        <div class="transaction-item-left">
+          <img src="https://flagcdn.com/w320/us.png" alt="US Flag" />
+          <div class="transaction-details">
+            <div class="transaction-type">Exchanged from USD</div>
+            <div class="transaction-date">17:45</div>
+          </div>
+        </div>
+        <div class="transaction-amount">+ UGX 14,511</div>
+      </div>
+      <div class="transaction-item">
+        <div class="transaction-item-left">
+          <span class="material-icons">credit_card</span>
+          <div class="transaction-details">
+            <div class="transaction-type">Added to card *9418</div>
+            <div class="transaction-date">17:42</div>
+          </div>
+        </div>
+        <div class="transaction-amount">- UGX 4,000</div>
+      </div>
+      <div class="transaction-item">
+        <div class="transaction-item-left">
+          <img src="https://flagcdn.com/w320/us.png" alt="US Flag" />
+          <div class="transaction-details">
+            <div class="transaction-type">Exchanged to USD</div>
+            <div class="transaction-date">17:45</div>
+          </div>
+        </div>
+        <div class="transaction-amount">- UGX 14,511</div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <span class="material-icons">account_balance_wallet</span>
+        <span>Balance</span>
+      </div>
+      <div class="nav-item">
+        <span class="material-icons">credit_card</span>
+        <span>Cards</span>
+      </div>
+      <div class="nav-item">
+        <span class="material-icons">send</span>
+        <span>Send</span>
+      </div>
+      <div class="nav-item">
+        <span class="material-icons">trending_up</span>
+        <span>Earn</span>
+      </div>
+      <div class="nav-item">
+        <span class="material-icons">more_horiz</span>
+        <span>More</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Base account balance (in UGX)
+    let currentBalanceUGX = 10000000;
+    // Exchange rates (mock data)
+    const exchangeRates = {
+      UGX: 1,
+      EUR: 0.00025,
+      GBP: 0.00022,
+      GHS: 0.0029,
+      KES: 0.033,
+      NGN: 0.0019,
+      USD: 0.00026,
+      CAD: 0.00035,
+      JPY: 0.038
+    };
+    // Ordered list of currencies (matching header order)
+    const currencies = ["UGX", "EUR", "GBP", "GHS", "KES", "NGN", "USD", "CAD", "JPY"];
+    let currentCurrencyIndex = 0;
+    // This will track the currently displayed converted value
+    let currentDisplayedValue = currentBalanceUGX * exchangeRates[currencies[currentCurrencyIndex]];
+
+    const mainBalanceEl = document.getElementById('mainBalance');
+    const balanceSection = document.getElementById('balanceSection');
+    const currencyListEl = document.getElementById('currencyList');
+    const headerCurrencies = currencyListEl.querySelectorAll('p');
+
+    // Helper: update the header to highlight the active currency
+    function updateHeaderHighlight() {
+      headerCurrencies.forEach((p, index) => {
+        p.classList.toggle('active-currency', index === currentCurrencyIndex);
+      });
+    }
+
+    // Animate the conversion value from start to end over a duration (ms)
+    function animateConversion(start, end, duration = 300) {
+      const startTime = performance.now();
+
+      function update(now) {
+        let progress = now - startTime;
+        let fraction = Math.min(progress / duration, 1);
+        let currentValue = start + (end - start) * fraction;
+        let code = currencies[currentCurrencyIndex];
+        mainBalanceEl.textContent = `${code} ${currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (fraction < 1) {
+          requestAnimationFrame(update);
+        } else {
+          currentDisplayedValue = end;
+        }
+      }
+      requestAnimationFrame(update);
+    }
+
+    // Initialize display with the starting conversion value (for UGX)
+    function updateDisplay() {
+      let code = currencies[currentCurrencyIndex];
+      let value = currentBalanceUGX * exchangeRates[code];
+      mainBalanceEl.textContent = `${code} ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      currentDisplayedValue = value;
+    }
+    updateDisplay();
+
+    // Variables to track swipe
+    let startX = 0;
+    let diffX = 0;
+    const threshold = 50;
+
+    function swipeStart(e) {
+      startX = e.touches ? e.touches[0].clientX : e.clientX;
+    }
+    function swipeMove(e) {
+      if (!startX) return;
+      let currentX = e.touches ? e.touches[0].clientX : e.clientX;
+      diffX = currentX - startX;
+    }
+    function swipeEnd() {
+      if (Math.abs(diffX) > threshold) {
+        if (diffX < 0 && currentCurrencyIndex < currencies.length - 1) {
+          currentCurrencyIndex++;
+        } else if (diffX > 0 && currentCurrencyIndex > 0) {
+          currentCurrencyIndex--;
+        }
+      }
+      const newValue = currentBalanceUGX * exchangeRates[currencies[currentCurrencyIndex]];
+      updateHeaderHighlight();
+      animateConversion(currentDisplayedValue, newValue, 300);
+      startX = 0;
+      diffX = 0;
+    }
+
+    balanceSection.addEventListener('touchstart', swipeStart);
+    balanceSection.addEventListener('touchmove', swipeMove);
+    balanceSection.addEventListener('touchend', swipeEnd);
+    balanceSection.addEventListener('mousedown', swipeStart);
+    balanceSection.addEventListener('mousemove', swipeMove);
+    balanceSection.addEventListener('mouseup', swipeEnd);
+    balanceSection.addEventListener('mouseleave', () => { if (startX) swipeEnd(); });
+
+    headerCurrencies.forEach((p, index) => {
+      p.addEventListener('click', () => {
+        if (index !== currentCurrencyIndex) {
+          const newValue = currentBalanceUGX * exchangeRates[p.dataset.currency];
+          currentCurrencyIndex = index;
+          updateHeaderHighlight();
+          animateConversion(currentDisplayedValue, newValue, 300);
+        }
+      });
+    });
+
+    // Navigate to deposit page when "Add money" button is clicked
+    document.getElementById("addMoneyButton").addEventListener("click", function(){
+      window.location.href = "deposit.html";
+    });
+  </script>
+</body>
+</html>

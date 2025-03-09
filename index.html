@@ -16,7 +16,6 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
-    /* Using Montserrat as primary font */
     body {
       font-family: 'Montserrat', sans-serif;
       background-color: #4834d4;
@@ -27,6 +26,7 @@
       max-width: 600px;
       margin: 0 auto;
       position: relative;
+      padding-bottom: 60px; /* to account for bottom navigation */
     }
 
     /* HEADER */
@@ -43,7 +43,6 @@
       overflow-x: auto;
       white-space: nowrap;
     }
-    /* Each currency is just the code now */
     .header-left p {
       font-size: 0.9rem;
       color: #fff;
@@ -196,9 +195,8 @@
   </style>
 </head>
 <body>
-
   <div class="container">
-    <!-- HEADER: Only currency codes (active one highlighted) -->
+    <!-- HEADER -->
     <div class="header">
       <div class="header-left" id="currencyList">
         <p data-currency="UGX" class="active-currency">UGX</p>
@@ -224,71 +222,30 @@
     <div class="action-buttons">
       <div class="action-button" id="addMoneyButton">
         <span class="material-icons">add_circle</span>
-        <span>Add money</span>
+        <span>Add Money</span>
       </div>
-      <div class="action-button">
-        <span class="material-icons">swap_horiz</span>
-        <span>Exchange</span>
+      <div class="action-button" id="withdrawMoneyButton">
+        <span class="material-icons">remove_circle</span>
+        <span>Withdraw</span>
       </div>
     </div>
 
-    <!-- TRANSACTIONS SECTION -->
+    <!-- TRANSACTIONS SECTION (Static example; you can generate these dynamically) -->
     <div class="transactions">
       <div class="transactions-header">
         <h2>Transactions</h2>
         <a href="#">See</a>
       </div>
-      <div class="transactions-date">February 16</div>
+      <div class="transactions-date">Today</div>
       <div class="transaction-item">
         <div class="transaction-item-left">
-          <img src="https://flagcdn.com/w320/us.png" alt="US Flag" />
+          <span class="material-icons">attach_money</span>
           <div class="transaction-details">
-            <div class="transaction-type">Exchanged to USD</div>
-            <div class="transaction-date">20:55</div>
+            <div class="transaction-type">Deposit</div>
+            <div class="transaction-date">09:00 AM</div>
           </div>
         </div>
-        <div class="transaction-amount">- UGX 0</div>
-      </div>
-      <div class="transactions-date">February 13</div>
-      <div class="transaction-item">
-        <div class="transaction-item-left">
-          <span class="material-icons">person</span>
-          <div class="transaction-details">
-            <div class="transaction-type">Sent to Dan Airtel</div>
-            <div class="transaction-date">17:52</div>
-          </div>
-        </div>
-        <div class="transaction-amount">- UGX 13,871</div>
-      </div>
-      <div class="transaction-item">
-        <div class="transaction-item-left">
-          <img src="https://flagcdn.com/w320/us.png" alt="US Flag" />
-          <div class="transaction-details">
-            <div class="transaction-type">Exchanged from USD</div>
-            <div class="transaction-date">17:45</div>
-          </div>
-        </div>
-        <div class="transaction-amount">+ UGX 14,511</div>
-      </div>
-      <div class="transaction-item">
-        <div class="transaction-item-left">
-          <span class="material-icons">credit_card</span>
-          <div class="transaction-details">
-            <div class="transaction-type">Added to card *9418</div>
-            <div class="transaction-date">17:42</div>
-          </div>
-        </div>
-        <div class="transaction-amount">- UGX 4,000</div>
-      </div>
-      <div class="transaction-item">
-        <div class="transaction-item-left">
-          <img src="https://flagcdn.com/w320/us.png" alt="US Flag" />
-          <div class="transaction-details">
-            <div class="transaction-type">Exchanged to USD</div>
-            <div class="transaction-date">17:45</div>
-          </div>
-        </div>
-        <div class="transaction-amount">- UGX 14,511</div>
+        <div class="transaction-amount">+ UGX 1,000</div>
       </div>
     </div>
 
@@ -318,8 +275,12 @@
   </div>
 
   <script>
-    // Base account balance (in UGX)
-    let currentBalanceUGX = 10000000;
+    // On load, initialize account balance from localStorage or set a default value.
+    if (!localStorage.getItem("balance")) {
+      localStorage.setItem("balance", 10000000);
+    }
+    let currentBalanceUGX = Number(localStorage.getItem("balance"));
+
     // Exchange rates (mock data)
     const exchangeRates = {
       UGX: 1,
@@ -332,10 +293,8 @@
       CAD: 0.00035,
       JPY: 0.038
     };
-    // Ordered list of currencies (matching header order)
     const currencies = ["UGX", "EUR", "GBP", "GHS", "KES", "NGN", "USD", "CAD", "JPY"];
     let currentCurrencyIndex = 0;
-    // This will track the currently displayed converted value
     let currentDisplayedValue = currentBalanceUGX * exchangeRates[currencies[currentCurrencyIndex]];
 
     const mainBalanceEl = document.getElementById('mainBalance');
@@ -343,34 +302,9 @@
     const currencyListEl = document.getElementById('currencyList');
     const headerCurrencies = currencyListEl.querySelectorAll('p');
 
-    // Helper: update the header to highlight the active currency
-    function updateHeaderHighlight() {
-      headerCurrencies.forEach((p, index) => {
-        p.classList.toggle('active-currency', index === currentCurrencyIndex);
-      });
-    }
-
-    // Animate the conversion value from start to end over a duration (ms)
-    function animateConversion(start, end, duration = 300) {
-      const startTime = performance.now();
-
-      function update(now) {
-        let progress = now - startTime;
-        let fraction = Math.min(progress / duration, 1);
-        let currentValue = start + (end - start) * fraction;
-        let code = currencies[currentCurrencyIndex];
-        mainBalanceEl.textContent = `${code} ${currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        if (fraction < 1) {
-          requestAnimationFrame(update);
-        } else {
-          currentDisplayedValue = end;
-        }
-      }
-      requestAnimationFrame(update);
-    }
-
-    // Initialize display with the starting conversion value (for UGX)
+    // Function to update the main balance display from localStorage.
     function updateDisplay() {
+      currentBalanceUGX = Number(localStorage.getItem("balance"));
       let code = currencies[currentCurrencyIndex];
       let value = currentBalanceUGX * exchangeRates[code];
       mainBalanceEl.textContent = `${code} ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -378,11 +312,32 @@
     }
     updateDisplay();
 
-    // Variables to track swipe
+    // Update active currency highlight.
+    function updateHeaderHighlight() {
+      headerCurrencies.forEach((p, index) => {
+        p.classList.toggle('active-currency', index === currentCurrencyIndex);
+      });
+    }
+
+    // Animate the conversion value.
+    function animateConversion(start, end, duration = 300) {
+      const startTime = performance.now();
+      function update(now) {
+        let progress = now - startTime;
+        let fraction = Math.min(progress / duration, 1);
+        let currentValue = start + (end - start) * fraction;
+        let code = currencies[currentCurrencyIndex];
+        mainBalanceEl.textContent = `${code} ${currentValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (fraction < 1) requestAnimationFrame(update);
+        else currentDisplayedValue = end;
+      }
+      requestAnimationFrame(update);
+    }
+
+    // Swipe functionality for currency conversion.
     let startX = 0;
     let diffX = 0;
     const threshold = 50;
-
     function swipeStart(e) {
       startX = e.touches ? e.touches[0].clientX : e.clientX;
     }
@@ -393,19 +348,14 @@
     }
     function swipeEnd() {
       if (Math.abs(diffX) > threshold) {
-        if (diffX < 0 && currentCurrencyIndex < currencies.length - 1) {
-          currentCurrencyIndex++;
-        } else if (diffX > 0 && currentCurrencyIndex > 0) {
-          currentCurrencyIndex--;
-        }
+        if (diffX < 0 && currentCurrencyIndex < currencies.length - 1) currentCurrencyIndex++;
+        else if (diffX > 0 && currentCurrencyIndex > 0) currentCurrencyIndex--;
       }
       const newValue = currentBalanceUGX * exchangeRates[currencies[currentCurrencyIndex]];
       updateHeaderHighlight();
       animateConversion(currentDisplayedValue, newValue, 300);
-      startX = 0;
-      diffX = 0;
+      startX = 0; diffX = 0;
     }
-
     balanceSection.addEventListener('touchstart', swipeStart);
     balanceSection.addEventListener('touchmove', swipeMove);
     balanceSection.addEventListener('touchend', swipeEnd);
@@ -413,7 +363,6 @@
     balanceSection.addEventListener('mousemove', swipeMove);
     balanceSection.addEventListener('mouseup', swipeEnd);
     balanceSection.addEventListener('mouseleave', () => { if (startX) swipeEnd(); });
-
     headerCurrencies.forEach((p, index) => {
       p.addEventListener('click', () => {
         if (index !== currentCurrencyIndex) {
@@ -425,9 +374,12 @@
       });
     });
 
-    // Navigate to deposit page when "Add money" button is clicked
+    // Navigate to deposit and withdrawal pages.
     document.getElementById("addMoneyButton").addEventListener("click", function(){
       window.location.href = "deposit.html";
+    });
+    document.getElementById("withdrawMoneyButton").addEventListener("click", function(){
+      window.location.href = "withdraw.html";
     });
   </script>
 </body>

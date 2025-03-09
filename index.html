@@ -257,16 +257,16 @@
     // Exchange rates.
     const exchangeRates = {
       UGX: 1,
-      €: 0.00025,
-      £: 0.00022,
-      ¢: 0.0029,
+      EUR: 0.00025,
+      GBP: 0.00022,
+      GHC: 0.0029,
       KES: 0.033,
       NGN: 0.0019,
-      $: 0.00026,
+      USD: 0.00026,
       CAD: 0.00035,
-      ¥: 0.038
+      JPY: 0.038
     };
-    const currencies = ["UGX", "€", "£", "¢", "KES", "NGN", "$", "CAD", "¥"];
+    const currencies = ["UGX", "EUR", "GBP", "GHC", "KES", "NGN", "USD", "CAD", "JPY"];
     let currentCurrencyIndex = 0;
     let currentDisplayedValue = currentBalanceUGX * exchangeRates[currencies[currentCurrencyIndex]];
 

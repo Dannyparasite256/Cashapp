@@ -97,6 +97,12 @@
       }
       let newBalance = currentBalance - withdrawAmount;
       localStorage.setItem("balance", newBalance);
+      
+      // Record transaction.
+      let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      transactions.push({ type: "withdrawal", amount: withdrawAmount, date: new Date().toLocaleString() });
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+      
       alert("Withdrew UGX " + withdrawAmount);
       window.location.href = "index.html";
     });

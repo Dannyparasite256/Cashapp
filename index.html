@@ -26,7 +26,7 @@
       max-width: 600px;
       margin: 0 auto;
       position: relative;
-      padding-bottom: 60px; /* to account for bottom navigation */
+      padding-bottom: 60px; /* space for bottom nav */
     }
 
     /* HEADER */
@@ -123,12 +123,6 @@
       color: #4834d4;
       font-size: 0.95rem;
     }
-    .transactions-date {
-      font-weight: 500;
-      margin: 15px 0 5px;
-      color: #777;
-      font-size: 0.9rem;
-    }
     .transaction-item {
       display: flex;
       justify-content: space-between;
@@ -141,11 +135,6 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
-    }
-    .transaction-item-left img {
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
     }
     .transaction-item-left .material-icons {
       font-size: 25px;
@@ -230,22 +219,14 @@
       </div>
     </div>
 
-    <!-- TRANSACTIONS SECTION (Static example; you can generate these dynamically) -->
+    <!-- TRANSACTIONS SECTION -->
     <div class="transactions">
       <div class="transactions-header">
         <h2>Transactions</h2>
         <a href="#">See</a>
       </div>
-      <div class="transactions-date">Today</div>
-      <div class="transaction-item">
-        <div class="transaction-item-left">
-          <span class="material-icons">attach_money</span>
-          <div class="transaction-details">
-            <div class="transaction-type">Deposit</div>
-            <div class="transaction-date">09:00 AM</div>
-          </div>
-        </div>
-        <div class="transaction-amount">+ UGX 1,000</div>
+      <div id="transactionsList">
+        <!-- Transaction items will be generated here dynamically -->
       </div>
     </div>
 
@@ -275,13 +256,15 @@
   </div>
 
   <script>
-    // On load, initialize account balance from localStorage or set a default value.
+    // Initialize localStorage balance if not present.
     if (!localStorage.getItem("balance")) {
       localStorage.setItem("balance", 10000000);
     }
+
+    // Load current balance.
     let currentBalanceUGX = Number(localStorage.getItem("balance"));
 
-    // Exchange rates (mock data)
+    // Exchange rates (mock data).
     const exchangeRates = {
       UGX: 1,
       EUR: 0.00025,
@@ -302,7 +285,7 @@
     const currencyListEl = document.getElementById('currencyList');
     const headerCurrencies = currencyListEl.querySelectorAll('p');
 
-    // Function to update the main balance display from localStorage.
+    // Update the balance display from localStorage.
     function updateDisplay() {
       currentBalanceUGX = Number(localStorage.getItem("balance"));
       let code = currencies[currentCurrencyIndex];
@@ -311,6 +294,31 @@
       currentDisplayedValue = value;
     }
     updateDisplay();
+
+    // Update transaction list display.
+    function updateTransactions() {
+      const transactionsListEl = document.getElementById("transactionsList");
+      let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      // Reverse the order so that latest appears first.
+      transactions = transactions.reverse();
+      transactionsListEl.innerHTML = transactions.map(tx => {
+        let icon = tx.type === "deposit" ? "attach_money" : "money_off";
+        let sign = tx.type === "deposit" ? "+" : "-";
+        return `
+          <div class="transaction-item">
+            <div class="transaction-item-left">
+              <span class="material-icons">${icon}</span>
+              <div class="transaction-details">
+                <div class="transaction-type">${tx.type === "deposit" ? "Deposit" : "Withdrawal"}</div>
+                <div class="transaction-date">${tx.date}</div>
+              </div>
+            </div>
+            <div class="transaction-amount">${sign} UGX ${Number(tx.amount).toLocaleString()}</div>
+          </div>
+        `;
+      }).join("");
+    }
+    updateTransactions();
 
     // Update active currency highlight.
     function updateHeaderHighlight() {
@@ -374,7 +382,7 @@
       });
     });
 
-    // Navigate to deposit and withdrawal pages.
+    // Navigation for deposit and withdrawal.
     document.getElementById("addMoneyButton").addEventListener("click", function(){
       window.location.href = "deposit.html";
     });

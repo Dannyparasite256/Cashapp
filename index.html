@@ -4,31 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Wallet UI</title>
-
-  <!-- Google Fonts: Using the provided fonts -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
       font-family: 'Montserrat', sans-serif;
       background-color: #4834d4;
       color: #fff;
     }
-
     .container {
       max-width: 600px;
       margin: 0 auto;
       position: relative;
-      padding-bottom: 60px; /* space for bottom nav */
+      padding-bottom: 60px;
     }
-
     /* HEADER */
     .header {
       display: flex;
@@ -60,8 +54,7 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
-
-    /* MAIN BALANCE SECTION */
+    /* MAIN BALANCE */
     .balance-section {
       text-align: center;
       padding: 50px 20px;
@@ -77,7 +70,6 @@
       font-size: 1.2rem;
       color: #c9c3ee;
     }
-
     /* ACTION BUTTONS */
     .action-buttons {
       display: flex;
@@ -102,8 +94,7 @@
       color: #9587e0;
       font-size: 0.9rem;
     }
-
-    /* TRANSACTIONS SECTION */
+    /* TRANSACTIONS */
     .transactions {
       background-color: #fff;
       color: #333;
@@ -151,7 +142,6 @@
     }
     .transaction-date { font-size: 0.85rem; color: #999; }
     .transaction-amount { font-weight: 600; font-size: 1rem; }
-
     /* BOTTOM NAV */
     .bottom-nav {
       position: fixed;
@@ -201,7 +191,7 @@
       <span class="material-icons">notifications</span>
     </div>
 
-    <!-- MAIN BALANCE SECTION -->
+    <!-- MAIN BALANCE -->
     <div class="balance-section" id="balanceSection">
       <div class="balance-amount" id="mainBalance">UGX 0</div>
       <div class="main-balance">Main balance</div>
@@ -219,18 +209,18 @@
       </div>
     </div>
 
-    <!-- TRANSACTIONS SECTION -->
+    <!-- TRANSACTIONS -->
     <div class="transactions">
       <div class="transactions-header">
         <h2>Transactions</h2>
         <a href="#">See</a>
       </div>
       <div id="transactionsList">
-        <!-- Transaction items will be generated here dynamically -->
+        <!-- Dynamically generated transaction items -->
       </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION -->
+    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
       <div class="nav-item active">
         <span class="material-icons">account_balance_wallet</span>
@@ -256,7 +246,7 @@
   </div>
 
   <script>
-    // Initialize localStorage balance if not present.
+    // Initialize balance if not set.
     if (!localStorage.getItem("balance")) {
       localStorage.setItem("balance", 10000000);
     }
@@ -264,7 +254,7 @@
     // Load current balance.
     let currentBalanceUGX = Number(localStorage.getItem("balance"));
 
-    // Exchange rates (mock data).
+    // Exchange rates.
     const exchangeRates = {
       UGX: 1,
       EUR: 0.00025,
@@ -285,7 +275,7 @@
     const currencyListEl = document.getElementById('currencyList');
     const headerCurrencies = currencyListEl.querySelectorAll('p');
 
-    // Update the balance display from localStorage.
+    // Update balance display.
     function updateDisplay() {
       currentBalanceUGX = Number(localStorage.getItem("balance"));
       let code = currencies[currentCurrencyIndex];
@@ -295,12 +285,12 @@
     }
     updateDisplay();
 
-    // Update transaction list display.
+    // Update transaction list.
     function updateTransactions() {
       const transactionsListEl = document.getElementById("transactionsList");
       let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-      // Reverse the order so that latest appears first.
-      transactions = transactions.reverse();
+      // Use a copy of the array and reverse so the original order in storage isn’t changed.
+      transactions = transactions.slice().reverse();
       transactionsListEl.innerHTML = transactions.map(tx => {
         let icon = tx.type === "deposit" ? "attach_money" : "money_off";
         let sign = tx.type === "deposit" ? "+" : "-";
@@ -320,14 +310,14 @@
     }
     updateTransactions();
 
-    // Update active currency highlight.
+    // Active currency highlight.
     function updateHeaderHighlight() {
       headerCurrencies.forEach((p, index) => {
         p.classList.toggle('active-currency', index === currentCurrencyIndex);
       });
     }
 
-    // Animate the conversion value.
+    // Animate balance conversion.
     function animateConversion(start, end, duration = 300) {
       const startTime = performance.now();
       function update(now) {
@@ -342,9 +332,8 @@
       requestAnimationFrame(update);
     }
 
-    // Swipe functionality for currency conversion.
-    let startX = 0;
-    let diffX = 0;
+    // Swipe for currency conversion.
+    let startX = 0, diffX = 0;
     const threshold = 50;
     function swipeStart(e) {
       startX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -382,7 +371,7 @@
       });
     });
 
-    // Navigation for deposit and withdrawal.
+    // Navigation to deposit and withdrawal pages.
     document.getElementById("addMoneyButton").addEventListener("click", function(){
       window.location.href = "deposit.html";
     });

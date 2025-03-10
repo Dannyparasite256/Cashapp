@@ -75,9 +75,8 @@
       gap: 20px;
       overflow-x: auto;
       padding: 20px;
-      /* Cards will take full width as in previous design */
     }
-    /* Each Card – using previous dimensions */
+    /* Each Card – using previous dimensions with visible border */
     .card {
       background-color: #1d267d;
       color: #fff;
@@ -89,7 +88,8 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       cursor: pointer;
       transition: transform 0.2s;
-      flex-shrink: 0; /* allow horizontal scrolling */
+      flex-shrink: 0;
+      border: 2px solid #fff; /* Visible border on all sides */
     }
     .card.active { 
       border: 2px solid #4831d4; 
@@ -389,7 +389,6 @@
       const cards = getCards();
       cardsContainer.innerHTML = "";
       cards.forEach((card, index) => {
-        // Create card element using template literal.
         const cardEl = document.createElement("div");
         cardEl.classList.add("card");
         if (index === selectedCardIndex) cardEl.classList.add("active");
@@ -420,7 +419,6 @@
             <i class="fa-brands fa-cc-visa"></i>
           </div>
         `;
-        // Add click listener to select card.
         cardEl.addEventListener("click", function(e) {
           if (e.target.closest(".toggle-details-btn")) return;
           selectedCardIndex = index;

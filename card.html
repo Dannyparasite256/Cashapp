@@ -24,17 +24,17 @@
       padding: 0;
     }
     body {
-      /* Changed from Poppins to Montserrat */
+      /* Changed to Montserrat */
       font-family: 'Montserrat', sans-serif;
       background-color: #f5f5f5;
       color: #333;
     }
-    /* Retained font-weight classes (names remain the same but now use Montserrat) */
+    /* Retained font-weight classes (names remain the same) */
     .poppins-semibold { font-weight: 600; }
     .poppins-regular { font-weight: 400; }
     .poppins-medium { font-weight: 500; }
     .poppins-bold { font-weight: 700; }
-
+    
     .container {
       width: 100%;
       max-width: 600px;
@@ -44,7 +44,6 @@
       display: flex;
       flex-direction: column;
     }
-
     /* Top bar */
     .top-bar {
       display: flex;
@@ -70,7 +69,6 @@
       font-size: 1rem;
       cursor: pointer;
     }
-
     /* Purple section */
     .purple-section {
       background-color: #4831d4;
@@ -78,7 +76,6 @@
       width: 100%;
       position: relative;
     }
-
     /* Card */
     .card {
       background-color: #1d267d;
@@ -134,8 +131,7 @@
     .card-footer i {
       font-size: 1.5rem;
     }
-
-    /* Balance Section (Shows card balance) */
+    /* Balance Section (Displays Card Balance) */
     .balance-section {
       padding: 20px;
     }
@@ -165,25 +161,60 @@
       align-items: center;
       gap: 5px;
     }
-
-    /* Transaction Log (new section to list transfers) */
-    .transaction-log {
+    /* Transactions (Styled like wallet index.html) */
+    .transactions {
+      padding: 20px;
       background-color: #fff;
-      border-top: 1px solid #eee;
-      padding: 10px 20px;
       margin: 20px 0;
+      border-top: 1px solid #eee;
     }
-    .transaction-log h3 {
+    .transactions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .transactions-header h2 {
       font-size: 1rem;
       color: #4831d4;
-      margin-bottom: 10px;
     }
-    .transaction-log .tx-item {
-      font-size: 0.9rem;
-      margin-bottom: 8px;
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
     }
-
-    /* Actions List (static menu) */
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+    .transaction-item-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .transaction-item-left i {
+      font-size: 25px;
+      color: #4831d4;
+    }
+    .transaction-details {
+      display: flex;
+      flex-direction: column;
+    }
+    .transaction-type {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .transaction-date {
+      font-size: 0.85rem;
+      color: #999;
+    }
+    .transaction-amount {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    /* Actions List (Static Menu) */
     .actions-list {
       padding: 0 20px 20px;
     }
@@ -216,7 +247,6 @@
     .remove-card .action-text {
       color: red;
     }
-
     /* Toggle Switch */
     .switch {
       position: relative;
@@ -254,7 +284,6 @@
     input:checked + .slider:before {
       transform: translateX(18px);
     }
-
     /* Footer Navigation */
     footer {
       background-color: #fff;
@@ -296,10 +325,8 @@
         <i class="fas fa-plus"></i>
       </button>
     </div>
-
     <!-- Purple section -->
     <div class="purple-section"></div>
-
     <!-- The Card -->
     <div class="card">
       <div class="card-header">
@@ -320,7 +347,6 @@
         <i class="fa-brands fa-cc-visa"></i>
       </div>
     </div>
-
     <!-- Balance Section (Displays Card Balance) -->
     <div class="balance-section">
       <h2 class="poppins-medium">Available balance</h2>
@@ -334,13 +360,15 @@
         </button>
       </div>
     </div>
-
-    <!-- Transaction Log -->
-    <div class="transaction-log" id="transactionLog">
-      <h3>Transaction History</h3>
-      <!-- Transaction items will appear here -->
+    <!-- Transactions Section (designed like wallet index.html) -->
+    <div class="transactions" id="transactionLog">
+      <div class="transactions-header">
+        <h2>Transactions</h2>
+        <!-- You can add a "See" link if desired -->
+        <a href="#">See</a>
+      </div>
+      <!-- Transaction items will be injected here by JavaScript -->
     </div>
-
     <!-- Actions List (Static Menu) -->
     <div class="actions-list">
       <div class="action-item">
@@ -375,7 +403,6 @@
         <div class="action-text poppins-regular">Remove card</div>
       </div>
     </div>
-
     <!-- Footer Navigation -->
     <footer>
       <nav>
@@ -414,7 +441,6 @@
       </nav>
     </footer>
   </div>
-
   <script>
     // Initialize balances and transactions if not present.
     if (!localStorage.getItem("walletBalance")) {
@@ -438,19 +464,40 @@
       document.getElementById("cardBalanceDisplay").textContent = formatCurrency(cardBalance);
     }
 
-    // Update the transaction log.
+    // Update the transactions log using a design similar to wallet index.html.
     function updateTransactionLog() {
       const txLogEl = document.getElementById("transactionLog");
       let transactions = JSON.parse(localStorage.getItem("cardTransactions")) || [];
-      // Show latest first.
+      // Reverse to show the most recent first.
       transactions = transactions.slice().reverse();
-      txLogEl.innerHTML = `<h3>Transaction History</h3>` + transactions.map(tx => {
+      // Build the transaction items using the same structure as wallet index.html.
+      const txItems = transactions.map(tx => {
+        // Use a card icon (fa-credit-card) as an extra icon.
+        let iconHtml = `<i class="fas fa-credit-card"></i>`;
         let sign = tx.type === "deposit" ? "+" : "-";
-        return `<div class="tx-item">${tx.date}: ${sign} ${formatCurrency(tx.amount)}</div>`;
+        return `
+          <div class="transaction-item">
+            <div class="transaction-item-left">
+              ${iconHtml}
+              <div class="transaction-details">
+                <div class="transaction-type">${tx.type === "deposit" ? "Deposit" : "Withdrawal"}</div>
+                <div class="transaction-date">${tx.date}</div>
+              </div>
+            </div>
+            <div class="transaction-amount">${sign} ${formatCurrency(tx.amount)}</div>
+          </div>
+        `;
       }).join("");
+      txLogEl.innerHTML = `
+        <div class="transactions-header">
+          <h2>Transactions</h2>
+          <a href="#">See</a>
+        </div>
+        ${txItems}
+      `;
     }
 
-    // Update display on load.
+    // Initial display updates.
     updateCardDisplay();
     updateTransactionLog();
 

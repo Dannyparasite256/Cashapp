@@ -24,7 +24,7 @@
       background-color: #f5f5f5;
       color: #333;
     }
-    /* Retained font-weight classes (names kept for convenience) */
+    /* Font-weight utility classes */
     .poppins-semibold { font-weight: 600; }
     .poppins-regular { font-weight: 400; }
     .poppins-medium { font-weight: 500; }
@@ -39,7 +39,7 @@
       display: flex;
       flex-direction: column;
       padding-bottom: 80px; /* space for fixed footer */
-      overflow: visible; /* Ensure child elements can extend beyond container bounds */
+      overflow: visible;
     }
     /* Top bar */
     .top-bar {
@@ -63,13 +63,8 @@
       font-size: 1rem;
       cursor: pointer;
     }
-    /* Purple section as background header */
-    .purple-section {
-      background-color: #4831d4;
-      height: 100px;
-      width: 100%;
-      position: relative;
-    }
+    /* Purple section removed */
+    
     /* Cards Container (Horizontal scroll) */
     .cards-container {
       display: flex;
@@ -77,21 +72,21 @@
       overflow-x: auto;
       padding: 20px;
     }
-    /* Each Card – using previous dimensions with visible border */
+    /* Each Card – updated margin now that the purple section is gone */
     .card {
       background-color: #1d267d;
       color: #fff;
       border-radius: 15px;
       width: 95%;
-      margin: -60px auto 0 auto; /* Overlap purple section */
+      margin: 20px auto 0 auto;
       padding: 20px;
       position: relative;
-      z-index: 2; /* Bring card above overlapping elements */
+      z-index: 2;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       cursor: pointer;
       transition: transform 0.2s;
       flex-shrink: 0;
-      border: 2px solid #fff; /* Visible border on all sides */
+      border: 2px solid #fff;
     }
     .card.active { 
       border: 2px solid #4831d4; 
@@ -176,7 +171,7 @@
     .action-arrow { color: #4831d4; }
     .remove-card .action-icon { color: red; }
     .remove-card .action-text { color: red; }
-    /* Transactions Section (designed like wallet index.html) */
+    /* Transactions Section */
     .transactions {
       padding: 20px;
       background-color: #fff;
@@ -259,8 +254,7 @@
         <i class="fas fa-plus"></i>
       </button>
     </div>
-    <!-- Purple section -->
-    <div class="purple-section"></div>
+    <!-- Purple section removed -->
     <!-- Cards Container (Horizontal scroll) -->
     <div class="cards-container" id="cardsContainer">
       <!-- Card elements will be injected here -->
@@ -312,7 +306,7 @@
         <div class="action-text poppins-regular">Remove card</div>
       </div>
     </div>
-    <!-- Transactions Section (Below the actions list) -->
+    <!-- Transactions Section -->
     <div class="transactions" id="transactionLog">
       <!-- Transaction items will be injected here -->
     </div>
@@ -323,7 +317,7 @@
     <nav>
       <ul>
         <li>
-          <a href="index.html">
+          <a href="#">
             <i class="fas fa-wallet"></i>
             Balance
           </a>

@@ -29,9 +29,7 @@
       background-color: #f5f5f5;
       color: #333;
     }
-
-    /* Retained poppins classes for font-weight.
-       They now inherit Montserrat from body */
+    /* Retained font-weight classes (names remain the same but now use Montserrat) */
     .poppins-semibold { font-weight: 600; }
     .poppins-regular { font-weight: 400; }
     .poppins-medium { font-weight: 500; }
@@ -105,17 +103,14 @@
       font-size: 0.875rem;
       letter-spacing: 1px;
     }
-
     .card-details {
       margin-top: 15px;
     }
-
     .card-number {
       font-size: 1.375rem;
       margin-bottom: 10px;
       letter-spacing: 1px;
     }
-
     .expiry-cvv-container {
       display: flex;
       align-items: center;
@@ -126,7 +121,6 @@
     .card-cvv {
       font-size: 0.875rem;
     }
-
     .card-name {
       font-size: 1rem;
       text-transform: uppercase;
@@ -141,7 +135,7 @@
       font-size: 1.5rem;
     }
 
-    /* Balance Section */
+    /* Balance Section (Shows card balance) */
     .balance-section {
       padding: 20px;
     }
@@ -172,7 +166,24 @@
       gap: 5px;
     }
 
-    /* Actions List */
+    /* Transaction Log (new section to list transfers) */
+    .transaction-log {
+      background-color: #fff;
+      border-top: 1px solid #eee;
+      padding: 10px 20px;
+      margin: 20px 0;
+    }
+    .transaction-log h3 {
+      font-size: 1rem;
+      color: #4831d4;
+      margin-bottom: 10px;
+    }
+    .transaction-log .tx-item {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    /* Actions List (static menu) */
     .actions-list {
       padding: 0 20px 20px;
     }
@@ -244,7 +255,7 @@
       transform: translateX(18px);
     }
 
-    /* Footer Nav */
+    /* Footer Navigation */
     footer {
       background-color: #fff;
       border-top: 1px solid #eee;
@@ -298,7 +309,7 @@
         <div class="card-virtua poppins-regular">VIRTUA</div>
       </div>
       <div class="card-details">
-        <div class="card-number poppins-medium">4519 46** **** 9418</div>
+        <div class="card-number poppins-medium" id="cardNumber">4519 46** **** 9418</div>
         <div class="expiry-cvv-container">
           <div class="card-expiry poppins-regular">VALID THRU 02/28</div>
           <div class="card-cvv poppins-regular">CVV ***</div>
@@ -310,21 +321,27 @@
       </div>
     </div>
 
-    <!-- Balance Section -->
+    <!-- Balance Section (Displays Card Balance) -->
     <div class="balance-section">
       <h2 class="poppins-medium">Available balance</h2>
-      <div class="balance poppins-bold">UGX 956,643.23</div>
+      <div class="balance poppins-bold" id="cardBalanceDisplay">UGX 0</div>
       <div class="balance-actions">
-        <button class="add-money">
+        <button class="add-money" id="addMoneyBtn">
           <i class="fas fa-plus"></i> Add money
         </button>
-        <button class="withdraw">
+        <button class="withdraw" id="withdrawMoneyBtn">
           <i class="fas fa-arrow-down"></i> Withdraw
         </button>
       </div>
     </div>
 
-    <!-- Actions List -->
+    <!-- Transaction Log -->
+    <div class="transaction-log" id="transactionLog">
+      <h3>Transaction History</h3>
+      <!-- Transaction items will appear here -->
+    </div>
+
+    <!-- Actions List (Static Menu) -->
     <div class="actions-list">
       <div class="action-item">
         <div class="action-icon">
@@ -364,7 +381,7 @@
       <nav>
         <ul>
           <li>
-            <a href="index.html">
+            <a href="#">
               <i class="fas fa-wallet"></i>
               Balance
             </a>
@@ -397,5 +414,90 @@
       </nav>
     </footer>
   </div>
+
+  <script>
+    // Initialize balances and transactions if not present.
+    if (!localStorage.getItem("walletBalance")) {
+      localStorage.setItem("walletBalance", "1000000"); // default wallet balance
+    }
+    if (!localStorage.getItem("cardBalance")) {
+      localStorage.setItem("cardBalance", "30356643.23"); // default card balance
+    }
+    if (!localStorage.getItem("cardTransactions")) {
+      localStorage.setItem("cardTransactions", JSON.stringify([]));
+    }
+
+    // Helper to format currency.
+    function formatCurrency(amount) {
+      return "UGX " + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Update the card balance display.
+    function updateCardDisplay() {
+      const cardBalance = Number(localStorage.getItem("cardBalance"));
+      document.getElementById("cardBalanceDisplay").textContent = formatCurrency(cardBalance);
+    }
+
+    // Update the transaction log.
+    function updateTransactionLog() {
+      const txLogEl = document.getElementById("transactionLog");
+      let transactions = JSON.parse(localStorage.getItem("cardTransactions")) || [];
+      // Show latest first.
+      transactions = transactions.slice().reverse();
+      txLogEl.innerHTML = `<h3>Transaction History</h3>` + transactions.map(tx => {
+        let sign = tx.type === "deposit" ? "+" : "-";
+        return `<div class="tx-item">${tx.date}: ${sign} ${formatCurrency(tx.amount)}</div>`;
+      }).join("");
+    }
+
+    // Update display on load.
+    updateCardDisplay();
+    updateTransactionLog();
+
+    // Event listener for "Add money" button.
+    document.getElementById("addMoneyBtn").addEventListener("click", function(){
+      let amount = parseFloat(prompt("Enter amount to add to card (will be deducted from wallet):"));
+      if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
+      let walletBalance = Number(localStorage.getItem("walletBalance"));
+      if (amount > walletBalance) {
+        return alert("Insufficient wallet funds!");
+      }
+      // Deduct from wallet, add to card.
+      walletBalance -= amount;
+      let cardBalance = Number(localStorage.getItem("cardBalance"));
+      cardBalance += amount;
+      localStorage.setItem("walletBalance", walletBalance);
+      localStorage.setItem("cardBalance", cardBalance);
+      // Record transaction.
+      let transactions = JSON.parse(localStorage.getItem("cardTransactions")) || [];
+      transactions.push({ type: "deposit", amount: amount, date: new Date().toLocaleString() });
+      localStorage.setItem("cardTransactions", JSON.stringify(transactions));
+      updateCardDisplay();
+      updateTransactionLog();
+      alert("Transferred " + formatCurrency(amount) + " from wallet to card.");
+    });
+
+    // Event listener for "Withdraw" button.
+    document.getElementById("withdrawMoneyBtn").addEventListener("click", function(){
+      let amount = parseFloat(prompt("Enter amount to withdraw from card (will be added to wallet):"));
+      if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
+      let cardBalance = Number(localStorage.getItem("cardBalance"));
+      if (amount > cardBalance) {
+        return alert("Insufficient card funds!");
+      }
+      cardBalance -= amount;
+      let walletBalance = Number(localStorage.getItem("walletBalance"));
+      walletBalance += amount;
+      localStorage.setItem("cardBalance", cardBalance);
+      localStorage.setItem("walletBalance", walletBalance);
+      // Record transaction.
+      let transactions = JSON.parse(localStorage.getItem("cardTransactions")) || [];
+      transactions.push({ type: "withdrawal", amount: amount, date: new Date().toLocaleString() });
+      localStorage.setItem("cardTransactions", JSON.stringify(transactions));
+      updateCardDisplay();
+      updateTransactionLog();
+      alert("Transferred " + formatCurrency(amount) + " from card to wallet.");
+    });
+  </script>
 </body>
 </html>

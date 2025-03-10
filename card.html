@@ -39,6 +39,7 @@
       display: flex;
       flex-direction: column;
       padding-bottom: 80px; /* space for fixed footer */
+      overflow: visible; /* Ensure child elements can extend beyond container bounds */
     }
     /* Top bar */
     .top-bar {
@@ -85,6 +86,7 @@
       margin: -60px auto 0 auto; /* Overlap purple section */
       padding: 20px;
       position: relative;
+      z-index: 2; /* Bring card above overlapping elements */
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       cursor: pointer;
       transition: transform 0.2s;

@@ -38,6 +38,7 @@
       background-color: #fff;
       display: flex;
       flex-direction: column;
+      padding-bottom: 80px; /* extra padding for fixed footer */
     }
     /* Top bar */
     .top-bar {
@@ -88,7 +89,7 @@
     .card-logo { font-size: 1rem; }
     .card-virtua { font-size: 0.875rem; letter-spacing: 1px; }
     .card-details { margin-top: 15px; }
-    /* New container for card number and eye toggle */
+    /* Container for card number and toggle button */
     .card-number-container {
       display: flex;
       justify-content: space-between;
@@ -231,12 +232,16 @@
     }
     input:checked + .slider { background-color: #4831d4; }
     input:checked + .slider:before { transform: translateX(18px); }
-    /* Footer Navigation */
+    /* Fixed Footer Navigation */
     footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
       background-color: #fff;
       border-top: 1px solid #eee;
       padding: 10px 0;
-      margin-top: auto;
+      z-index: 10;
     }
     footer nav ul {
       list-style: none;
@@ -349,43 +354,6 @@
     <div class="transactions" id="transactionLog">
       <!-- Transaction items will be injected here by JavaScript -->
     </div>
-    <!-- Footer Navigation -->
-    <footer>
-      <nav>
-        <ul>
-          <li>
-            <a href="#">
-              <i class="fas fa-wallet"></i>
-              Balance
-            </a>
-          </li>
-          <li class="active">
-            <a href="index.html">
-              <i class="fa-regular fa-credit-card"></i>
-              Cards
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="fas fa-paper-plane"></i>
-              Send
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="fas fa-money-bill-wave"></i>
-              Earn
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="fas fa-ellipsis-h"></i>
-              More
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </footer>
   </div>
 
   <script>

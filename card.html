@@ -29,7 +29,7 @@
     .poppins-regular { font-weight: 400; }
     .poppins-medium { font-weight: 500; }
     .poppins-bold { font-weight: 700; }
-
+    
     .container {
       width: 100%;
       max-width: 600px;
@@ -80,17 +80,6 @@
       position: relative;
       z-index: 1;
     }
-    /* Toggle details button */
-    .toggle-details-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 1.25rem;
-      cursor: pointer;
-    }
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -99,24 +88,38 @@
     .card-logo { font-size: 1rem; }
     .card-virtua { font-size: 0.875rem; letter-spacing: 1px; }
     .card-details { margin-top: 15px; }
+    /* New container for card number and eye toggle */
+    .card-number-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
     .card-number {
       font-size: 1.375rem;
-      margin-bottom: 10px;
       letter-spacing: 1px;
+    }
+    .toggle-details-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.25rem;
+      cursor: pointer;
     }
     .expiry-cvv-container {
       display: flex;
       align-items: center;
       gap: 20px;
-      margin-bottom: 5px;
+      margin: 10px 0;
     }
     .card-expiry, .card-cvv { font-size: 0.875rem; }
-    /* Assign IDs for toggling */
-    #cardExpiry, #cardCvv { }
     .card-name { font-size: 1rem; text-transform: uppercase; margin-top: 8px; }
-    .card-footer { display: flex; justify-content: flex-end; margin-top: 15px; }
+    .card-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+    }
     .card-footer i { font-size: 1.5rem; }
-    /* Balance Section */
+    /* Balance Section (Displays Card Balance) */
     .balance-section { padding: 20px; }
     .balance-section h2 { font-size: 1rem; color: #555; }
     .balance { font-size: 1.5rem; color: #4831d4; margin: 8px 0 15px; }
@@ -159,7 +162,7 @@
     .action-arrow { color: #4831d4; }
     .remove-card .action-icon { color: red; }
     .remove-card .action-text { color: red; }
-    /* Transactions Section */
+    /* Transactions Section (designed like wallet index.html) */
     .transactions {
       padding: 20px;
       background-color: #fff;
@@ -277,12 +280,14 @@
         </div>
         <div class="card-virtua poppins-regular">VIRTUA</div>
       </div>
-      <!-- Eye icon to toggle card details -->
-      <button id="toggleDetails" class="toggle-details-btn" aria-label="Show card details">
-        <i class="fas fa-eye"></i>
-      </button>
       <div class="card-details">
-        <div class="card-number poppins-medium" id="cardNumber">4519 46** **** 9418</div>
+        <div class="card-number-container">
+          <div class="card-number poppins-medium" id="cardNumber">4519 46** **** 9418</div>
+          <!-- Eye icon placed to the right of the card number -->
+          <button id="toggleDetails" class="toggle-details-btn" aria-label="Show card details">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
         <div class="expiry-cvv-container">
           <div class="card-expiry poppins-regular" id="cardExpiry">VALID THRU 02/28</div>
           <div class="card-cvv poppins-regular" id="cardCvv">CVV ***</div>
@@ -384,19 +389,15 @@
   </div>
 
   <script>
-    // --- Card details toggle functionality ---
+    // --- Toggle card details functionality ---
     let showCardDetails = false;
-    // Full vs masked card details
     const fullCardNumber = "4519 4612 3456 9418";
     const maskedCardNumber = "4519 46** **** 9418";
     const fullCvv = "CVV 123";
     const maskedCvv = "CVV ***";
-    // Toggle details when eye icon is clicked.
     document.getElementById("toggleDetails").addEventListener("click", function(){
       showCardDetails = !showCardDetails;
-      // Update icon (optional: toggle between eye and eye-slash)
       this.innerHTML = showCardDetails ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
-      // Update displayed card details.
       document.getElementById("cardNumber").textContent = showCardDetails ? fullCardNumber : maskedCardNumber;
       document.getElementById("cardCvv").textContent = showCardDetails ? fullCvv : maskedCvv;
     });
@@ -411,16 +412,13 @@
     if (!localStorage.getItem("cardTransactions")) {
       localStorage.setItem("cardTransactions", JSON.stringify([]));
     }
-    // Helper to format currency.
     function formatCurrency(amount) {
       return "UGX " + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
-    // Update card balance display.
     function updateCardDisplay() {
       const cardBalance = Number(localStorage.getItem("cardBalance"));
       document.getElementById("cardBalanceDisplay").textContent = formatCurrency(cardBalance);
     }
-    // Update transactions log.
     function updateTransactionLog() {
       const txLogEl = document.getElementById("transactionLog");
       let transactions = JSON.parse(localStorage.getItem("cardTransactions")) || [];
@@ -449,9 +447,9 @@
         ${txItems}
       `;
     }
-    // Initial display update.
     updateCardDisplay();
     updateTransactionLog();
+
     // --- Button operations ---
     document.getElementById("addMoneyBtn").addEventListener("click", function(){
       let amount = parseFloat(prompt("Enter amount to add to card (will be deducted from wallet):"));

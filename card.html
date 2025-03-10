@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Card UI</title>
-  <!-- Google Fonts (Updated to use our wallet fonts) -->
+  <title>Virtual Cards UI</title>
+  <!-- Google Fonts (using our wallet fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
@@ -24,12 +24,12 @@
       background-color: #f5f5f5;
       color: #333;
     }
-    /* Retained font-weight classes */
+    /* Retained font-weight classes (names kept for convenience) */
     .poppins-semibold { font-weight: 600; }
     .poppins-regular { font-weight: 400; }
     .poppins-medium { font-weight: 500; }
     .poppins-bold { font-weight: 700; }
-    
+
     .container {
       width: 100%;
       max-width: 600px;
@@ -38,7 +38,7 @@
       background-color: #fff;
       display: flex;
       flex-direction: column;
-      padding-bottom: 80px; /* extra padding for fixed footer */
+      padding-bottom: 80px; /* extra space for fixed footer */
     }
     /* Top bar */
     .top-bar {
@@ -62,24 +62,38 @@
       font-size: 1rem;
       cursor: pointer;
     }
-    /* Purple section */
+    /* Purple section as background header */
     .purple-section {
       background-color: #4831d4;
       height: 100px;
       width: 100%;
       position: relative;
     }
-    /* Card */
+    /* Cards Container (Horizontal scroll) */
+    .cards-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px;
+      /* To overlap the purple section */
+      margin-top: -40px;
+    }
+    /* Each Card */
     .card {
       background-color: #1d267d;
       color: #fff;
       border-radius: 15px;
-      width: 95%;
-      margin: -60px auto 0 auto; /* Overlap purple section */
+      flex: 0 0 auto;
+      width: 280px;
       padding: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       position: relative;
-      z-index: 1;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .card.active { 
+      border: 2px solid #4831d4; 
+      transform: scale(1.02);
     }
     .card-header {
       display: flex;
@@ -89,16 +103,13 @@
     .card-logo { font-size: 1rem; }
     .card-virtua { font-size: 0.875rem; letter-spacing: 1px; }
     .card-details { margin-top: 15px; }
-    /* Container for card number and toggle button */
+    /* Container for card number and eye toggle */
     .card-number-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .card-number {
-      font-size: 1.375rem;
-      letter-spacing: 1px;
-    }
+    .card-number { font-size: 1.375rem; letter-spacing: 1px; }
     .toggle-details-btn {
       background: none;
       border: none;
@@ -120,7 +131,7 @@
       margin-top: 15px;
     }
     .card-footer i { font-size: 1.5rem; }
-    /* Balance Section (Displays Card Balance) */
+    /* Balance Section (for selected card) */
     .balance-section { padding: 20px; }
     .balance-section h2 { font-size: 1rem; color: #555; }
     .balance { font-size: 1.5rem; color: #4831d4; margin: 8px 0 15px; }
@@ -167,7 +178,7 @@
     .transactions {
       padding: 20px;
       background-color: #fff;
-      margin: 20px 0;
+      margin: 20px;
       border-top: 1px solid #eee;
     }
     .transactions-header {
@@ -203,35 +214,6 @@
     .transaction-type { font-size: 1rem; font-weight: 500; margin-bottom: 2px; }
     .transaction-date { font-size: 0.85rem; color: #999; }
     .transaction-amount { font-weight: 600; font-size: 1rem; }
-    /* Toggle Switch */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 40px;
-      height: 22px;
-    }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 14px;
-      width: 14px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider { background-color: #4831d4; }
-    input:checked + .slider:before { transform: translateX(18px); }
     /* Fixed Footer Navigation */
     footer {
       position: fixed;
@@ -271,39 +253,17 @@
     <!-- Top bar -->
     <div class="top-bar">
       <h1 class="poppins-semibold">Cards</h1>
-      <button class="add-card-btn" aria-label="Add Card">
+      <button class="add-card-btn" id="addCardBtn" aria-label="Add Card">
         <i class="fas fa-plus"></i>
       </button>
     </div>
     <!-- Purple section -->
     <div class="purple-section"></div>
-    <!-- The Card -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-logo">
-          <i class="fa-regular fa-copyright"></i>
-        </div>
-        <div class="card-virtua poppins-regular">VIRTUA</div>
-      </div>
-      <div class="card-details">
-        <div class="card-number-container">
-          <div class="card-number poppins-medium" id="cardNumber">4519 46** **** 9418</div>
-          <!-- Eye icon placed to the right of the card number -->
-          <button id="toggleDetails" class="toggle-details-btn" aria-label="Show card details">
-            <i class="fas fa-eye"></i>
-          </button>
-        </div>
-        <div class="expiry-cvv-container">
-          <div class="card-expiry poppins-regular" id="cardExpiry">VALID THRU 02/28</div>
-          <div class="card-cvv poppins-regular" id="cardCvv">CVV ***</div>
-        </div>
-        <div class="card-name poppins-bold">KAKEETO DANIEL</div>
-      </div>
-      <div class="card-footer">
-        <i class="fa-brands fa-cc-visa"></i>
-      </div>
+    <!-- Cards Container (Horizontal scroll) -->
+    <div class="cards-container" id="cardsContainer">
+      <!-- Card elements will be injected here -->
     </div>
-    <!-- Balance Section (Displays Card Balance) -->
+    <!-- Balance Section (for selected card) -->
     <div class="balance-section">
       <h2 class="poppins-medium">Available balance</h2>
       <div class="balance poppins-bold" id="cardBalanceDisplay">UGX 0</div>
@@ -350,50 +310,159 @@
         <div class="action-text poppins-regular">Remove card</div>
       </div>
     </div>
-    <!-- Transactions Section (Below the actions list) -->
+    <!-- Transactions Section -->
     <div class="transactions" id="transactionLog">
-      <!-- Transaction items will be injected here by JavaScript -->
+      <!-- Transaction items will be injected here -->
     </div>
   </div>
 
-  <script>
-    // --- Toggle card details functionality ---
-    let showCardDetails = false;
-    const fullCardNumber = "4519 4612 3456 9418";
-    const maskedCardNumber = "4519 46** **** 9418";
-    const fullCvv = "CVV 123";
-    const maskedCvv = "CVV ***";
-    document.getElementById("toggleDetails").addEventListener("click", function(){
-      showCardDetails = !showCardDetails;
-      this.innerHTML = showCardDetails ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
-      document.getElementById("cardNumber").textContent = showCardDetails ? fullCardNumber : maskedCardNumber;
-      document.getElementById("cardCvv").textContent = showCardDetails ? fullCvv : maskedCvv;
-    });
+  <!-- Fixed Footer Navigation -->
+  <footer>
+    <nav>
+      <ul>
+        <li>
+          <a href="#">
+            <i class="fas fa-wallet"></i>
+            Balance
+          </a>
+        </li>
+        <li class="active">
+          <a href="#">
+            <i class="fa-regular fa-credit-card"></i>
+            Cards
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-paper-plane"></i>
+            Send
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-money-bill-wave"></i>
+            Earn
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="fas fa-ellipsis-h"></i>
+            More
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </footer>
 
-    // --- Balances and Transactions ---
-    if (!localStorage.getItem("walletBalance")) {
-      localStorage.setItem("walletBalance", "1000000"); // default wallet balance
+  <script>
+    // Global variable to track the selected card index.
+    let selectedCardIndex = 0;
+    
+    // Utility functions to get and save cards in localStorage.
+    function getCards() {
+      return JSON.parse(localStorage.getItem("cards"));
     }
-    if (!localStorage.getItem("cardBalance")) {
-      localStorage.setItem("cardBalance", "30356643.23"); // default card balance
+    function saveCards(cards) {
+      localStorage.setItem("cards", JSON.stringify(cards));
     }
-    if (!localStorage.getItem("cardTransactions")) {
-      localStorage.setItem("cardTransactions", JSON.stringify([]));
+    
+    // Initialize cards in localStorage if not present.
+    if (!localStorage.getItem("cards")) {
+      const defaultCard = {
+        id: Date.now(),
+        fullCardNumber: "4519 461234569418",
+        maskedCardNumber: "4519 46** **** 9418",
+        fullCvv: "123",
+        maskedCvv: "***",
+        cardHolder: "KAKEETO DANIEL",
+        expiry: "VALID THRU 02/28",
+        balance: 30356643.23,
+        transactions: [],
+        showDetails: false
+      };
+      saveCards([defaultCard]);
     }
-    function formatCurrency(amount) {
-      return "UGX " + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    // Function to render all cards in the horizontal container.
+    function renderCards() {
+      const cardsContainer = document.getElementById("cardsContainer");
+      const cards = getCards();
+      cardsContainer.innerHTML = "";
+      cards.forEach((card, index) => {
+        // Create card element using template literal.
+        const cardEl = document.createElement("div");
+        cardEl.classList.add("card");
+        if (index === selectedCardIndex) cardEl.classList.add("active");
+        cardEl.setAttribute("data-index", index);
+        cardEl.innerHTML = `
+          <div class="card-header">
+            <div class="card-logo">
+              <i class="fa-regular fa-copyright"></i>
+            </div>
+            <div class="card-virtua poppins-regular">VIRTUA</div>
+          </div>
+          <div class="card-details">
+            <div class="card-number-container">
+              <div class="card-number poppins-medium" id="cardNumber-${card.id}">
+                ${card.showDetails ? card.fullCardNumber : card.maskedCardNumber}
+              </div>
+              <button class="toggle-details-btn" data-id="${card.id}" aria-label="Toggle card details">
+                <i class="fas ${card.showDetails ? "fa-eye-slash" : "fa-eye"}"></i>
+              </button>
+            </div>
+            <div class="expiry-cvv-container">
+              <div class="card-expiry poppins-regular" id="cardExpiry-${card.id}">${card.expiry}</div>
+              <div class="card-cvv poppins-regular" id="cardCvv-${card.id}">${card.showDetails ? "CVV " + card.fullCvv : "CVV " + card.maskedCvv}</div>
+            </div>
+            <div class="card-name poppins-bold">${card.cardHolder}</div>
+          </div>
+          <div class="card-footer">
+            <i class="fa-brands fa-cc-visa"></i>
+          </div>
+        `;
+        // Add click listener to select card.
+        cardEl.addEventListener("click", function(e) {
+          // Avoid conflict with the toggle button.
+          if (e.target.closest(".toggle-details-btn")) return;
+          selectedCardIndex = index;
+          updateSelectedCardDisplay();
+          renderCards();
+        });
+        cardsContainer.appendChild(cardEl);
+      });
+      // Attach toggle listener for each toggle-details-btn.
+      document.querySelectorAll(".toggle-details-btn").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+          e.stopPropagation(); // prevent card selection
+          const cardId = Number(this.getAttribute("data-id"));
+          let cards = getCards();
+          const idx = cards.findIndex(c => c.id === cardId);
+          if (idx >= 0) {
+            cards[idx].showDetails = !cards[idx].showDetails;
+            saveCards(cards);
+            renderCards();
+            if (selectedCardIndex === idx) updateSelectedCardDisplay();
+          }
+        });
+      });
     }
-    function updateCardDisplay() {
-      const cardBalance = Number(localStorage.getItem("cardBalance"));
-      document.getElementById("cardBalanceDisplay").textContent = formatCurrency(cardBalance);
+    
+    // Update the balance display and transactions log for the selected card.
+    function updateSelectedCardDisplay() {
+      const cards = getCards();
+      const selectedCard = cards[selectedCardIndex];
+      document.getElementById("cardBalanceDisplay").textContent = formatCurrency(selectedCard.balance);
+      updateTransactionLog(selectedCard.transactions);
     }
-    function updateTransactionLog() {
+    
+    // Update the transactions log.
+    function updateTransactionLog(transactions) {
       const txLogEl = document.getElementById("transactionLog");
-      let transactions = JSON.parse(localStorage.getItem("cardTransactions")) || [];
-      transactions = transactions.slice().reverse();
-      const txItems = transactions.map(tx => {
-        let iconHtml = `<i class="fas fa-credit-card"></i>`;
-        let sign = tx.type === "deposit" ? "+" : "-";
+      // Reverse transactions to show most recent first.
+      const txs = transactions.slice().reverse();
+      const txItems = txs.map(tx => {
+        const iconHtml = `<i class="fas fa-credit-card"></i>`;
+        const sign = tx.type === "deposit" ? "+" : "-";
         return `
           <div class="transaction-item">
             <div class="transaction-item-left">
@@ -415,48 +484,82 @@
         ${txItems}
       `;
     }
-    updateCardDisplay();
-    updateTransactionLog();
-
-    // --- Button operations ---
+    
+    // Helper to format currency.
+    function formatCurrency(amount) {
+      return "UGX " + Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    
+    // Event listeners for "Add money" and "Withdraw" (operate on selected card)
     document.getElementById("addMoneyBtn").addEventListener("click", function(){
       let amount = parseFloat(prompt("Enter amount to add to card (will be deducted from wallet):"));
       if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
-      let walletBalance = Number(localStorage.getItem("walletBalance"));
-      if (amount > walletBalance) {
-        return alert("Insufficient wallet funds!");
-      }
-      walletBalance -= amount;
-      let cardBalance = Number(localStorage.getItem("cardBalance"));
-      cardBalance += amount;
-      localStorage.setItem("walletBalance", walletBalance);
-      localStorage.setItem("cardBalance", cardBalance);
-      let transactions = JSON.parse(localStorage.getItem("cardTransactions")) || [];
-      transactions.push({ type: "deposit", amount: amount, date: new Date().toLocaleString() });
-      localStorage.setItem("cardTransactions", JSON.stringify(transactions));
-      updateCardDisplay();
-      updateTransactionLog();
+      // For simplicity, assume wallet funds are sufficient.
+      let cards = getCards();
+      const card = cards[selectedCardIndex];
+      card.balance += amount;
+      // Record transaction.
+      card.transactions.push({ type: "deposit", amount: amount, date: new Date().toLocaleString() });
+      saveCards(cards);
+      updateSelectedCardDisplay();
+      renderCards();
       alert("Transferred " + formatCurrency(amount) + " from wallet to card.");
     });
+    
     document.getElementById("withdrawMoneyBtn").addEventListener("click", function(){
       let amount = parseFloat(prompt("Enter amount to withdraw from card (will be added to wallet):"));
       if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
-      let cardBalance = Number(localStorage.getItem("cardBalance"));
-      if (amount > cardBalance) {
-        return alert("Insufficient card funds!");
-      }
-      cardBalance -= amount;
-      let walletBalance = Number(localStorage.getItem("walletBalance"));
-      walletBalance += amount;
-      localStorage.setItem("cardBalance", cardBalance);
-      localStorage.setItem("walletBalance", walletBalance);
-      let transactions = JSON.parse(localStorage.getItem("cardTransactions")) || [];
-      transactions.push({ type: "withdrawal", amount: amount, date: new Date().toLocaleString() });
-      localStorage.setItem("cardTransactions", JSON.stringify(transactions));
-      updateCardDisplay();
-      updateTransactionLog();
+      let cards = getCards();
+      const card = cards[selectedCardIndex];
+      if (amount > card.balance) return alert("Insufficient card funds!");
+      card.balance -= amount;
+      // Record transaction.
+      card.transactions.push({ type: "withdrawal", amount: amount, date: new Date().toLocaleString() });
+      saveCards(cards);
+      updateSelectedCardDisplay();
+      renderCards();
       alert("Transferred " + formatCurrency(amount) + " from card to wallet.");
     });
+    
+    // Event listener for "Add Card" button (top right plus)
+    document.getElementById("addCardBtn").addEventListener("click", function(){
+      // Prompt for new card details.
+      const fullCardNumber = prompt("Enter full card number:");
+      if (!fullCardNumber) return;
+      const cardHolder = prompt("Enter card holder's name:");
+      if (!cardHolder) return;
+      const expiry = prompt("Enter expiry (e.g., VALID THRU 02/28):");
+      if (!expiry) return;
+      const fullCvv = prompt("Enter CVV:");
+      if (!fullCvv) return;
+      // For simplicity, create masked values.
+      const maskedCardNumber = fullCardNumber.slice(0,4) + " " + fullCardNumber.slice(4,6) + "** **** " + fullCardNumber.slice(-4);
+      const maskedCvv = "*".repeat(fullCvv.length);
+      // New card object with zero balance and empty transactions.
+      const newCard = {
+        id: Date.now(),
+        fullCardNumber: fullCardNumber,
+        maskedCardNumber: maskedCardNumber,
+        fullCvv: fullCvv,
+        maskedCvv: maskedCvv,
+        cardHolder: cardHolder.toUpperCase(),
+        expiry: expiry,
+        balance: 0,
+        transactions: [],
+        showDetails: false
+      };
+      let cards = getCards();
+      cards.push(newCard);
+      saveCards(cards);
+      selectedCardIndex = cards.length - 1; // select new card
+      renderCards();
+      updateSelectedCardDisplay();
+      alert("New card created!");
+    });
+    
+    // Initial render
+    renderCards();
+    updateSelectedCardDisplay();
   </script>
 </body>
 </html>

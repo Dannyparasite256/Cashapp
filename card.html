@@ -29,7 +29,7 @@
     .poppins-regular { font-weight: 400; }
     .poppins-medium { font-weight: 500; }
     .poppins-bold { font-weight: 700; }
-
+    
     .container {
       width: 100%;
       max-width: 600px;
@@ -38,7 +38,7 @@
       background-color: #fff;
       display: flex;
       flex-direction: column;
-      padding-bottom: 80px; /* extra space for fixed footer */
+      padding-bottom: 80px; /* space for fixed footer */
     }
     /* Top bar */
     .top-bar {
@@ -75,21 +75,21 @@
       gap: 20px;
       overflow-x: auto;
       padding: 20px;
-      /* To overlap the purple section */
-      margin-top: -40px;
+      /* Cards will take full width as in previous design */
     }
-    /* Each Card */
+    /* Each Card – using previous dimensions */
     .card {
       background-color: #1d267d;
       color: #fff;
       border-radius: 15px;
-      flex: 0 0 auto;
-      width: px;
+      width: 95%;
+      margin: -60px auto 0 auto; /* Overlap purple section */
       padding: 20px;
       position: relative;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       cursor: pointer;
       transition: transform 0.2s;
+      flex-shrink: 0; /* allow horizontal scrolling */
     }
     .card.active { 
       border: 2px solid #4831d4; 
@@ -310,7 +310,7 @@
         <div class="action-text poppins-regular">Remove card</div>
       </div>
     </div>
-    <!-- Transactions Section -->
+    <!-- Transactions Section (Below the actions list) -->
     <div class="transactions" id="transactionLog">
       <!-- Transaction items will be injected here -->
     </div>
@@ -422,7 +422,6 @@
         `;
         // Add click listener to select card.
         cardEl.addEventListener("click", function(e) {
-          // Avoid conflict with the toggle button.
           if (e.target.closest(".toggle-details-btn")) return;
           selectedCardIndex = index;
           updateSelectedCardDisplay();
@@ -430,10 +429,9 @@
         });
         cardsContainer.appendChild(cardEl);
       });
-      // Attach toggle listener for each toggle-details-btn.
       document.querySelectorAll(".toggle-details-btn").forEach(btn => {
         btn.addEventListener("click", function(e) {
-          e.stopPropagation(); // prevent card selection
+          e.stopPropagation();
           const cardId = Number(this.getAttribute("data-id"));
           let cards = getCards();
           const idx = cards.findIndex(c => c.id === cardId);
@@ -458,7 +456,6 @@
     // Update the transactions log.
     function updateTransactionLog(transactions) {
       const txLogEl = document.getElementById("transactionLog");
-      // Reverse transactions to show most recent first.
       const txs = transactions.slice().reverse();
       const txItems = txs.map(tx => {
         const iconHtml = `<i class="fas fa-credit-card"></i>`;
@@ -494,11 +491,9 @@
     document.getElementById("addMoneyBtn").addEventListener("click", function(){
       let amount = parseFloat(prompt("Enter amount to add to card (will be deducted from wallet):"));
       if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
-      // For simplicity, assume wallet funds are sufficient.
       let cards = getCards();
       const card = cards[selectedCardIndex];
       card.balance += amount;
-      // Record transaction.
       card.transactions.push({ type: "deposit", amount: amount, date: new Date().toLocaleString() });
       saveCards(cards);
       updateSelectedCardDisplay();
@@ -513,7 +508,6 @@
       const card = cards[selectedCardIndex];
       if (amount > card.balance) return alert("Insufficient card funds!");
       card.balance -= amount;
-      // Record transaction.
       card.transactions.push({ type: "withdrawal", amount: amount, date: new Date().toLocaleString() });
       saveCards(cards);
       updateSelectedCardDisplay();
@@ -523,7 +517,6 @@
     
     // Event listener for "Add Card" button (top right plus)
     document.getElementById("addCardBtn").addEventListener("click", function(){
-      // Prompt for new card details.
       const fullCardNumber = prompt("Enter full card number:");
       if (!fullCardNumber) return;
       const cardHolder = prompt("Enter card holder's name:");
@@ -532,10 +525,8 @@
       if (!expiry) return;
       const fullCvv = prompt("Enter CVV:");
       if (!fullCvv) return;
-      // For simplicity, create masked values.
       const maskedCardNumber = fullCardNumber.slice(0,4) + " " + fullCardNumber.slice(4,6) + "** **** " + fullCardNumber.slice(-4);
       const maskedCvv = "*".repeat(fullCvv.length);
-      // New card object with zero balance and empty transactions.
       const newCard = {
         id: Date.now(),
         fullCardNumber: fullCardNumber,
@@ -551,7 +542,7 @@
       let cards = getCards();
       cards.push(newCard);
       saveCards(cards);
-      selectedCardIndex = cards.length - 1; // select new card
+      selectedCardIndex = cards.length - 1;
       renderCards();
       updateSelectedCardDisplay();
       alert("New card created!");

@@ -1,6 +1,6 @@
 {
-  "name": "Cash App Bank UI",
-  "short_name": "CashApp",
+  "name": "Eversend",
+  "short_name": "Eversend",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",
